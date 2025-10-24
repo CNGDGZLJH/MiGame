@@ -65,18 +65,18 @@ public class PlayerController : MonoBehaviour
         }
     }
  
-    private void Resonate()
-    {
+    //private void Resonate()
+    //{
         
-        StartCoroutine(ResonanceVisualEffect());
+    //    StartCoroutine(ResonanceVisualEffect());
 
         
-        //AudioSource.PlayClipAtPoint(yourResonanceSound, transform.position);
+    //    //AudioSource.PlayClipAtPoint(yourResonanceSound, transform.position);
 
-    }
+    //}
 
-    
-    private System.Collections.IEnumerator ResonanceVisualEffect()
+
+    /*private System.Collections.IEnumerator ResonanceVisualEffect()
     {
         Material mat = GetComponent<Renderer>().material;
         Color originalEmission = mat.GetColor("_EmissionColor");
@@ -94,5 +94,38 @@ public class PlayerController : MonoBehaviour
         
         yield return new WaitForSeconds(0.3f);
         mat.SetColor("_EmissionColor", originalEmission);
+    }*/
+
+
+    //update by LJH 2025-10-24: 添加协程执行锁，防止多次触发共振效果重叠
+    private bool _isResonating = false; // 新增：协程执行锁
+
+    private void Resonate()
+    {
+        if (!_isResonating) // 只有当协程未在执行时，才触发新的共振
+        {
+            StartCoroutine(ResonanceVisualEffect());
+        }
+    }
+
+    private System.Collections.IEnumerator ResonanceVisualEffect()
+    {
+        _isResonating = true; // 标记为“正在共振”
+
+        Material mat = GetComponent<Renderer>().material;
+        Color originalEmission = mat.GetColor("_EmissionColor");
+        Color brightEmission = originalEmission * 5;
+
+        mat.SetColor("_EmissionColor", brightEmission);
+
+        GameObject pulse = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        pulse.transform.position = transform.position;
+        pulse.transform.rotation = Quaternion.Euler(90, 0, 0);
+        Destroy(pulse, 1f);
+
+        yield return new WaitForSeconds(0.3f);
+        mat.SetColor("_EmissionColor", originalEmission);
+
+        _isResonating = false; // 协程执行完毕，解锁
     }
 }
