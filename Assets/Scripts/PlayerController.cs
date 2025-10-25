@@ -155,9 +155,12 @@ public class PlayerController : MonoBehaviour
     private bool _isResonating = false;
     private Vector3 _horizontalForward; // 纯水平发射方向
 
+    public Vector3 startPosition = new Vector3(0, 0, 0);
+    private Vector3 _initialPosition;//初始化角色位置
     void Start()
     {
         _controller = GetComponent<CharacterController>();
+        _initialPosition = transform.position;
     }
 
     void Update()
