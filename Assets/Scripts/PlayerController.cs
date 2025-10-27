@@ -1,128 +1,3 @@
-/*using System.Collections;
-using UnityEngine;
-
-public class PlayerController : MonoBehaviour
-{
-    [Header("Movement Settings")]
-    [SerializeField] private float _moveSpeed = 5f;
-    [SerializeField] private float _jumpHeight = 2f;
-    [SerializeField] private float _gravity = -9.81f;
-
-    [Header("Paper Settings")]
-    [SerializeField] private float paperSpeed = 15f;
-    [SerializeField] private float paperDestroyDelay = 2f;
-    [SerializeField] private float fixedYHeight = 0.5f; // ¹Ì¶¨·¢Éä¸ß¶È£¨Ïà¶ÔµØÃæ£©
-    [SerializeField] private float angularDrag = 5f; // ¼«¸ßĞı×ª×èÁ¦
-    [SerializeField] private float spawnOffset = 0.2f;
-
-    private CharacterController _controller;
-    private Vector3 _playerVelocity;
-    private bool _isGrounded;
-    private bool _isResonating = false;
-    private Vector3 _horizontalForward; // ´¿Ë®Æ½·¢Éä·½Ïò
-
-    public Vector3 startPosition = new Vector3(0, 0, 0);
-    private Vector3 _initialPosition;//³õÊ¼»¯½ÇÉ«Î»ÖÃ
-    void Start()
-    {
-        _controller = GetComponent<CharacterController>();
-        _initialPosition = transform.position;
-    }
-
-    void Update()
-    {
-        // ¼ÆËã´¿Ë®Æ½·½Ïò£¨Ïû³ıYÖá·ÖÁ¿£©
-        _horizontalForward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
-
-        // ½ÇÉ«ÒÆ¶¯Âß¼­
-        _isGrounded = _controller.isGrounded;
-        if (_isGrounded && _playerVelocity.y < 0)
-        {
-            _playerVelocity.y = -0.5f;
-        }
-
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-        Vector3 moveDirection = (transform.right * horizontal + transform.forward * vertical).normalized;
-        _controller.Move(moveDirection * _moveSpeed * Time.deltaTime);
-
-        if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
-        {
-            _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -2f * _gravity);
-        }
-
-        _playerVelocity.y += _gravity * Time.deltaTime;
-        _controller.Move(_playerVelocity * Time.deltaTime);
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Resonate();
-        }
-    }
-
-    private void Resonate()
-    {
-        if (!_isResonating)
-        {
-            StartCoroutine(ResonanceVisualEffect());
-        }
-    }
-
-    private IEnumerator ResonanceVisualEffect()
-    {
-        _isResonating = true;
-
-        // ·¢¹âĞ§¹û
-        Material mat = GetComponent<Renderer>().material;
-        Color originalEmission = mat.GetColor("_EmissionColor");
-        Color brightEmission = originalEmission * 5;
-        mat.SetColor("_EmissionColor", brightEmission);
-
-        // Éú³ÉÖ½Æ¬
-        GameObject paper = GameObject.CreatePrimitive(PrimitiveType.Quad);
-
-        // 1. ¹Ì¶¨·¢Éä¸ß¶È£¨»ùÓÚµØÃæ£¬¶ø·Ç½ÇÉ«Î»ÖÃ£©
-        // ¼ÆËã½ÇÉ«½ÅÏÂµØÃæµÄY×ø±ê£¨¼ÙÉè½ÇÉ« pivot ÔÚ½Åµ×£¬·ñÔòĞèµ÷Õû£©
-        float groundY = transform.position.y - _controller.height / 2;
-        Vector3 spawnPos = new Vector3(
-            transform.position.x + _horizontalForward.x * 0.3f + Random.Range(-spawnOffset, spawnOffset),
-            groundY + fixedYHeight, // ÑÏ¸ñ¹Ì¶¨ÔÚµØÃæÉÏ·½fixedYHeight´¦
-            transform.position.z + _horizontalForward.z * 0.3f + Random.Range(-spawnOffset, spawnOffset)
-        );
-        paper.transform.position = spawnPos;
-
-        // 2. Ç¿ÖÆË®Æ½×ËÌ¬£¨Ë«ÖØËø¶¨£©
-        paper.transform.rotation = Quaternion.Euler(90, transform.eulerAngles.y, 0);
-        // Ëø¶¨Ğı×ªÖá£¬½ûÖ¹ÈÎºÎ·½ÏòµÄĞı×ª
-        paper.transform.GetComponent<Transform>().rotation = Quaternion.Euler(90, transform.eulerAngles.y, 0);
-
-        // 3. ÎïÀí×é¼ş£ºÍêÈ«¶³½á×ËÌ¬ºÍ´¹Ö±Î»ÖÃ
-        MeshCollider meshCollider = paper.GetComponent<MeshCollider>();
-        meshCollider.convex = true;
-
-        Rigidbody rb = paper.AddComponent<Rigidbody>();
-        rb.useGravity = false;
-        rb.angularDrag = angularDrag;
-        // ¶³½áYÖáÎ»ÖÃºÍËùÓĞĞı×ª£¬½öÔÊĞíX¡¢ZÖáÆ½ÒÆ
-        rb.constraints = RigidbodyConstraints.FreezePositionY
-                       | RigidbodyConstraints.FreezeRotationX
-                       | RigidbodyConstraints.FreezeRotationY
-                       | RigidbodyConstraints.FreezeRotationZ;
-        // ÑØË®Æ½·½ÏòÉèÖÃËÙ¶È
-        rb.velocity = _horizontalForward * paperSpeed;
-
-        Destroy(paper, paperDestroyDelay);
-
-        yield return new WaitForSeconds(0.3f);
-        mat.SetColor("_EmissionColor", originalEmission);
-        _isResonating = false;
-    }
-}*/
-
-
-
-//LJH_20251028
-
 using System.Collections;
 using UnityEngine;
 
@@ -134,9 +9,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _gravity = -9.81f;
 
     [Header("Mouse Look Settings")]
-    // ±£ÁôÁéÃô¶È²ÎÊıµ«Ä¬ÈÏÉèÎª1£¨±íÊ¾1:1Ó³Éä£¬²»¶îÍâËõ·Å£©
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È²ï¿½ï¿½ï¿½ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½Îª1ï¿½ï¿½ï¿½ï¿½Ê¾1:1Ó³ï¿½ä£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å£ï¿½
     [SerializeField] private float mouseSensitivity = 1f;
-    // ÓÅÏÈÊ¹ÓÃ´ËÉãÏñ»úµÄ Y Ğı×ª×÷Îª½ÇÉ«³¯Ïò£¬ÈôÎª¿ÕÔò»ØÍËµ½»ùÓÚÊó±êÊäÈëµÄÂß¼­
+    // ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½ï¿½×ªï¿½ï¿½Îªï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½
     [SerializeField] private Transform playerCamera;
 
     [Header("Paper Settings")]
@@ -152,51 +27,51 @@ public class PlayerController : MonoBehaviour
     private bool _isResonating = false;
     private Vector3 _horizontalForward;
 
-    private float yRotation; // ½ÇÉ«YÖáĞı×ª½Ç¶È£¨Ö±½ÓÏìÓ¦ÉãÏñ»ú/Êó±êÊäÈë£©
+    private float yRotation; // ï¿½ï¿½É«Yï¿½ï¿½ï¿½ï¿½×ªï¿½Ç¶È£ï¿½Ö±ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë£©
 
     void Start()
     {
         _controller = GetComponent<CharacterController>();
         if (_controller == null)
         {
-            Debug.LogError("½ÇÉ«È±ÉÙCharacterController×é¼ş£¡");
+            Debug.LogError("ï¿½ï¿½É«È±ï¿½ï¿½CharacterControllerï¿½ï¿½ï¿½ï¿½ï¿½");
         }
 
-        // ÈôÎ´ÔÚ Inspector Ö¸¶¨ÉãÏñ»ú£¬³¢ÊÔÊ¹ÓÃÖ÷ÉãÏñ»ú
+        // ï¿½ï¿½Î´ï¿½ï¿½ Inspector Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (playerCamera == null && Camera.main != null)
         {
             playerCamera = Camera.main.transform;
         }
 
-        // Ëø¶¨Êó±ê£¬È·±£ÊäÈë²»ÊÜ´°¿ÚÓ°Ïì
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê£¬È·ï¿½ï¿½ï¿½ï¿½ï¿½ë²»ï¿½Ü´ï¿½ï¿½ï¿½Ó°ï¿½ï¿½
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // ³õÊ¼»¯Ğı×ªÎª½ÇÉ«³õÊ¼³¯Ïò
+        // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½×ªÎªï¿½ï¿½É«ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
         yRotation = transform.eulerAngles.y;
     }
 
     void Update()
     {
-        // 1. Êó±ê/ÉãÏñ»úĞı×ª£¨±£Ö¤½ÇÉ«YÖáÓëÊÓ½ÇÒ»ÖÂ£©
+        // 1. ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½É«Yï¿½ï¿½ï¿½ï¿½ï¿½Ó½ï¿½Ò»ï¿½Â£ï¿½
         UpdateRotationWithMouseOrCamera();
 
-        // 2. ¼ÆËãË®Æ½Ç°·½
+        // 2. ï¿½ï¿½ï¿½ï¿½Ë®Æ½Ç°ï¿½ï¿½
         _horizontalForward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
 
-        // 3. ½ÇÉ«ÒÆ¶¯
+        // 3. ï¿½ï¿½É«ï¿½Æ¶ï¿½
         HandleMovement();
 
-        // 4. ÖØÁ¦ÓëÌøÔ¾
+        // 4. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¾
         HandleGravityAndJump();
 
-        // 5. Ö½Æ¬·¢Éä
+        // 5. Ö½Æ¬ï¿½ï¿½ï¿½ï¿½
         if (Input.GetKeyDown(KeyCode.R))
         {
             Resonate();
         }
 
-        // ½âËøÊó±ê
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
@@ -204,19 +79,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ÓÅÏÈ¶ÁÈ¡ÉãÏñ»úµÄ Y ½Ç¶È£¬È·±£½ÇÉ«·½ÏòÓëÊÓ½ÇÍêÈ«Ò»ÖÂ¡£
-    // ÈôÎ´Ìá¹©ÉãÏñ»úÒıÓÃÔò»ØÍËµ½»ùÓÚÊó±êÊäÈëµÄĞı×ª£¨±£³Ö¼æÈİĞÔ£©¡£
+    // ï¿½ï¿½ï¿½È¶ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½Ç¶È£ï¿½È·ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½È«Ò»ï¿½Â¡ï¿½
+    // ï¿½ï¿½Î´ï¿½á¹©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½ï¿½Ô£ï¿½ï¿½ï¿½
     private void UpdateRotationWithMouseOrCamera()
     {
         if (playerCamera != null)
         {
-            // Ö±½ÓÊ¹ÓÃÉãÏñ»úµÄÊÀ½ç Y ½Ç¶È£¨±ÜÃâ²åÖµ»òËõ·Å£©£¬Ê¹½ÇÉ«ÓëÊÓ½ÇÍêÈ«Í¬²½
+            // Ö±ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½Ç¶È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½É«ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½È«Í¬ï¿½ï¿½
             yRotation = playerCamera.eulerAngles.y;
             transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
             return;
         }
 
-        // »ØÍË£ºÊ¹ÓÃÊó±êÊäÈë½øĞĞĞı×ª£¨Ô­ÓĞÂß¼­£©
+        // ï¿½ï¿½ï¿½Ë£ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Ô­ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½
         float mouseX = Input.GetAxis("Mouse X");
         yRotation += mouseX * mouseSensitivity * 100f * Time.deltaTime;
         transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
@@ -252,7 +127,7 @@ public class PlayerController : MonoBehaviour
         _controller.Move(_playerVelocity * Time.deltaTime);
     }
 
-    // Ö½Æ¬·¢ÉäÂß¼­£¨±£³Ö²»±ä£©
+    // Ö½Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö²ï¿½ï¿½ä£©
     private void Resonate()
     {
         if (!_isResonating)
@@ -307,4 +182,37 @@ public class PlayerController : MonoBehaviour
 
         _isResonating = false;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("NPC"))
+        {
+            interactHint.SetActive(true);
+        }
+        if (other.CompareTag("NPC"))
+        {
+            nearbyNPC = other.GetComponent<NPCController>();
+        }
+        if (other.CompareTag("NPC"))
+        {
+            if (interactHint != null) interactHint.SetActive(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("NPC"))
+        {
+            interactHint.SetActive(false);
+        }
+        if (other.CompareTag("NPC") && nearbyNPC == other.GetComponent<NPCController>())
+        {
+            nearbyNPC = null;
+        }
+        if (other.CompareTag("NPC"))
+        {
+            if (interactHint != null) interactHint.SetActive(false);
+        }
+    }
+
 }

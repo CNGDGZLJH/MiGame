@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 public class MouseLook : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private float _mouseSensitivity = 100f;
     [SerializeField] private Transform _playerBody;
     [SerializeField] private float _distanceFromPlayer = 5f;
     [SerializeField] private LayerMask _obstructionMask;
@@ -19,8 +18,7 @@ public class MouseLook : MonoBehaviour
     [Header("Rotation Settings")]
     public float rotationDamping = 3.0f;
 
-    private float _xRotation = 0f;
-    private float _yRotation = 0f;
+
     public float xSpeed = 250.0f; // X轴（水平）旋转速度
     public float ySpeed = 120.0f; // Y轴（垂直）旋转速度
     public float yMinLimit = -20f; // Y轴旋转最小角度
