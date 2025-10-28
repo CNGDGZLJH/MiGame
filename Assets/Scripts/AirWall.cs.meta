@@ -1,11 +1,9 @@
 fileFormatVersion: 2
-guid: 92c6947ed021019499a05b33e4ff397c
+guid: 3b525b3082fdf5d46a2e39bf3caf1f2b
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences:
-  - speechBubble: {fileID: 1333426083978418294, guid: a3e1df8f742f39442b5cefa7e323dce9,
-      type: 3}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
