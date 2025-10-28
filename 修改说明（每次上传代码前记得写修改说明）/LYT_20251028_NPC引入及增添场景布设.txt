@@ -1,0 +1,38 @@
+摘要：增添NPCController.cs,部分实现其功能（漫游），与玩家交互功能未完成；
+    在PlayerController中增加了与NPC互动的逻辑；
+    增加树木模型、NPC模型、交互提示贴图与NPC聊天气泡（未在运行时成功实现）
+
+修改内容如下：
+NPCController.cs；
+PlayerController.cs:
+private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("NPC"))
+        {
+            interactHint.SetActive(true);
+        }
+        if (other.CompareTag("NPC"))
+        {
+            nearbyNPC = other.GetComponent<NPCController>();
+        }
+        if (other.CompareTag("NPC"))
+        {
+            if (interactHint != null) interactHint.SetActive(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("NPC"))
+        {
+            interactHint.SetActive(false);
+        }
+        if (other.CompareTag("NPC") && nearbyNPC == other.GetComponent<NPCController>())
+        {
+            nearbyNPC = null;
+        }
+        if (other.CompareTag("NPC"))
+        {
+            if (interactHint != null) interactHint.SetActive(false);
+        }
+    }
