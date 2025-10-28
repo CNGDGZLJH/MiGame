@@ -1,138 +1,4 @@
-/*using System.Globalization;
-using UnityEngine;
-using UnityEngine.UIElements;
-
-
-
-public class PlayerController : MonoBehaviour
-{
-    [Header("Movement Settings")]
-    [SerializeField] private float _moveSpeed = 5f;  
-    [SerializeField] private float _jumpHeight = 2f;  
-    [SerializeField] private float _gravity = -9.81f;
-
-    public float moveSpeed => _moveSpeed;  
-    public float jumpHeight => _jumpHeight;
-    public float gravity => _gravity;
-
-    private CharacterController _controller;
-    private Vector3 _playerVelocity;
-    private bool _isGrounded;
-    private Vector3 _originalScale;
-
-    public float jumpScaleFactor = 1.2f; 
-    public float scaleReturnSpeed = 5f;
-
-    void Start()
-    {
-        _controller = GetComponent<CharacterController>();
-        _originalScale = transform.localScale;
-    }
-
-    void Update()
-    {
-        
-        _isGrounded = _controller.isGrounded;
-        if (_isGrounded && _playerVelocity.y < 0)
-        {
-            _playerVelocity.y = 0f;
-        }
-
-        if (_isGrounded && _playerVelocity.y < 0)
-        {
-            _playerVelocity.y = -0.5f; // 轻微下压力防止悬空
-        }
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-        Vector3 moveDirection = (transform.right * horizontal + transform.forward * vertical).normalized;
-
-        
-        _controller.Move(moveDirection * _moveSpeed * Time.deltaTime);
-
-        
-        if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
-        {
-            _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -2f * _gravity);
-            
-        }
-
-        _playerVelocity.y += _gravity * Time.deltaTime;
-        _controller.Move(_playerVelocity * Time.deltaTime);
- 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Resonate();
-        }
-    }
- 
-    //private void Resonate()
-    //{
-        
-    //    StartCoroutine(ResonanceVisualEffect());
-
-        
-    //    //AudioSource.PlayClipAtPoint(yourResonanceSound, transform.position);
-
-    //}*/
-
-
-/*private System.Collections.IEnumerator ResonanceVisualEffect()
-{
-    Material mat = GetComponent<Renderer>().material;
-    Color originalEmission = mat.GetColor("_EmissionColor");
-    Color brightEmission = originalEmission * 5; 
-
-    mat.SetColor("_EmissionColor", brightEmission);
-
-
-    GameObject pulse = GameObject.CreatePrimitive(PrimitiveType.Quad);
-    pulse.transform.position = transform.position;
-    pulse.transform.rotation = Quaternion.Euler(90, 0, 0); 
-    //pulse.GetComponent<Renderer>().material = yourPulseMaterial; 
-    Destroy(pulse, 1f); 
-
-
-    yield return new WaitForSeconds(0.3f);
-    mat.SetColor("_EmissionColor", originalEmission);
-}*/
-
-
-//update by LJH 2025-10-24: 添加协程执行锁，防止多次触发共振效果重叠
-/*private bool _isResonating = false; // 新增：协程执行锁
-
-private void Resonate()
-{
-    if (!_isResonating) // 只有当协程未在执行时，才触发新的共振
-    {
-        StartCoroutine(ResonanceVisualEffect());
-    }
-}
-
-private System.Collections.IEnumerator ResonanceVisualEffect()
-{
-    _isResonating = true; // 标记为“正在共振”
-
-    Material mat = GetComponent<Renderer>().material;
-    Color originalEmission = mat.GetColor("_EmissionColor");
-    Color brightEmission = originalEmission * 5;
-
-    mat.SetColor("_EmissionColor", brightEmission);
-
-    GameObject pulse = GameObject.CreatePrimitive(PrimitiveType.Quad);
-    pulse.transform.position = transform.position;
-    pulse.transform.rotation = Quaternion.Euler(90, 0, 0);
-    Destroy(pulse, 1f);
-
-    yield return new WaitForSeconds(0.3f);
-    mat.SetColor("_EmissionColor", originalEmission);
-
-    _isResonating = false; // 协程执行完毕，解锁
-}
-}*/
-
-
-
-using System.Collections;
+/*using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -249,6 +115,196 @@ public class PlayerController : MonoBehaviour
 
         yield return new WaitForSeconds(0.3f);
         mat.SetColor("_EmissionColor", originalEmission);
+        _isResonating = false;
+    }
+}*/
+
+
+
+//LJH_20251028
+
+using System.Collections;
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    [Header("Movement Settings")]
+    [SerializeField] private float _moveSpeed = 5f;
+    [SerializeField] private float _jumpHeight = 2f;
+    [SerializeField] private float _gravity = -9.81f;
+
+    [Header("Mouse Look Settings")]
+    // 保留灵敏度参数但默认设为1（表示1:1映射，不额外缩放）
+    [SerializeField] private float mouseSensitivity = 1f;
+    // 优先使用此摄像机的 Y 旋转作为角色朝向，若为空则回退到基于鼠标输入的逻辑
+    [SerializeField] private Transform playerCamera;
+
+    [Header("Paper Settings")]
+    [SerializeField] private float paperSpeed = 15f;
+    [SerializeField] private float paperDestroyDelay = 2f;
+    [SerializeField] private float fixedYHeight = 0.5f;
+    [SerializeField] private float angularDrag = 5f;
+    [SerializeField] private float spawnOffset = 0.2f;
+
+    private CharacterController _controller;
+    private Vector3 _playerVelocity;
+    private bool _isGrounded;
+    private bool _isResonating = false;
+    private Vector3 _horizontalForward;
+
+    private float yRotation; // 角色Y轴旋转角度（直接响应摄像机/鼠标输入）
+
+    void Start()
+    {
+        _controller = GetComponent<CharacterController>();
+        if (_controller == null)
+        {
+            Debug.LogError("角色缺少CharacterController组件！");
+        }
+
+        // 若未在 Inspector 指定摄像机，尝试使用主摄像机
+        if (playerCamera == null && Camera.main != null)
+        {
+            playerCamera = Camera.main.transform;
+        }
+
+        // 锁定鼠标，确保输入不受窗口影响
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // 初始化旋转为角色初始朝向
+        yRotation = transform.eulerAngles.y;
+    }
+
+    void Update()
+    {
+        // 1. 鼠标/摄像机旋转（保证角色Y轴与视角一致）
+        UpdateRotationWithMouseOrCamera();
+
+        // 2. 计算水平前方
+        _horizontalForward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
+
+        // 3. 角色移动
+        HandleMovement();
+
+        // 4. 重力与跳跃
+        HandleGravityAndJump();
+
+        // 5. 纸片发射
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Resonate();
+        }
+
+        // 解锁鼠标
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    }
+
+    // 优先读取摄像机的 Y 角度，确保角色方向与视角完全一致。
+    // 若未提供摄像机引用则回退到基于鼠标输入的旋转（保持兼容性）。
+    private void UpdateRotationWithMouseOrCamera()
+    {
+        if (playerCamera != null)
+        {
+            // 直接使用摄像机的世界 Y 角度（避免插值或缩放），使角色与视角完全同步
+            yRotation = playerCamera.eulerAngles.y;
+            transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+            return;
+        }
+
+        // 回退：使用鼠标输入进行旋转（原有逻辑）
+        float mouseX = Input.GetAxis("Mouse X");
+        yRotation += mouseX * mouseSensitivity * 100f * Time.deltaTime;
+        transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+    }
+
+    private void HandleMovement()
+    {
+        _isGrounded = _controller.isGrounded;
+
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        Vector3 moveDir = (transform.right * horizontal + transform.forward * vertical).normalized;
+
+        if (moveDir.magnitude >= 0.1f)
+        {
+            _controller.Move(moveDir * _moveSpeed * Time.deltaTime);
+        }
+    }
+
+    private void HandleGravityAndJump()
+    {
+        if (_isGrounded && _playerVelocity.y < 0)
+        {
+            _playerVelocity.y = -0.5f;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
+        {
+            _playerVelocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
+        }
+
+        _playerVelocity.y += _gravity * Time.deltaTime;
+        _controller.Move(_playerVelocity * Time.deltaTime);
+    }
+
+    // 纸片发射逻辑（保持不变）
+    private void Resonate()
+    {
+        if (!_isResonating)
+        {
+            StartCoroutine(ResonanceVisualEffect());
+        }
+    }
+
+    private IEnumerator ResonanceVisualEffect()
+    {
+        _isResonating = true;
+
+        Renderer renderer = GetComponent<Renderer>();
+        if (renderer != null && renderer.material.HasProperty("_EmissionColor"))
+        {
+            Material mat = renderer.material;
+            Color originalEmission = mat.GetColor("_EmissionColor");
+            Color brightEmission = originalEmission * 5;
+            mat.SetColor("_EmissionColor", brightEmission);
+
+            yield return new WaitForSeconds(0.3f);
+            mat.SetColor("_EmissionColor", originalEmission);
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.3f);
+        }
+
+        GameObject paper = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        float groundY = transform.position.y - _controller.height / 2f;
+        Vector3 spawnPos = new Vector3(
+            transform.position.x + _horizontalForward.x * 0.3f + Random.Range(-spawnOffset, spawnOffset),
+            groundY + fixedYHeight,
+            transform.position.z + _horizontalForward.z * 0.3f + Random.Range(-spawnOffset, spawnOffset)
+        );
+        paper.transform.position = spawnPos;
+        paper.transform.rotation = Quaternion.Euler(90f, transform.eulerAngles.y, 0f);
+
+        MeshCollider meshCollider = paper.GetComponent<MeshCollider>();
+        meshCollider.convex = true;
+
+        Rigidbody rb = paper.AddComponent<Rigidbody>();
+        rb.useGravity = false;
+        rb.angularDrag = angularDrag;
+        rb.constraints = RigidbodyConstraints.FreezePositionY
+                       | RigidbodyConstraints.FreezeRotationX
+                       | RigidbodyConstraints.FreezeRotationY
+                       | RigidbodyConstraints.FreezeRotationZ;
+        rb.velocity = _horizontalForward * paperSpeed;
+
+        Destroy(paper, paperDestroyDelay);
+
         _isResonating = false;
     }
 }
