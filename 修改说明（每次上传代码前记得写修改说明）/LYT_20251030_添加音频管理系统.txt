@@ -1,0 +1,18 @@
+摘要：新建AudioManager.cs脚本管理音频文件，并已挂载音频到空物体AudioManager的组件上；
+修改NPCController.cs文件，加入了交互音频相关代码。
+改动部分：void InteractWithObject()
+    {       
+	 	AudioManager.Instance.PlaySoundEffect("finding a treature");
+    }
+
+
+
+if (Input.GetKeyDown(KeyCode.E) && nearbyNPC != null)
+        {
+            bool invoked = nearbyNPC.InvokeInteractHint();
+            if (!invoked)
+            {
+                nearbyNPC.Interact();
+            }
+            InteractWithObject();
+        }

@@ -66,6 +66,7 @@ public class NPCController : MonoBehaviour
             {
                 nearbyNPC.Interact();
             }
+            InteractWithObject();
         }
     }
 
@@ -274,6 +275,11 @@ public class NPCController : MonoBehaviour
             Destroy(currentBubble);
             currentBubble = null;
         }
+    }
+    void InteractWithObject()
+    {
+        // ≤•∑≈Ωªª•“Ù–ß
+        AudioManager.Instance.PlaySoundEffect("finding a treature");
     }
 }
 

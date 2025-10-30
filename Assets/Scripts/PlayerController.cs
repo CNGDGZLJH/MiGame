@@ -9,210 +9,116 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _gravity = -9.81f;
 
     [Header("Mouse Look Settings")]
-
-    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È²ï¿½ï¿½ï¿½ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½Îª1ï¿½ï¿½ï¿½ï¿½Ê¾1:1Ó³ï¿½ä£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å£ï¿½
+    // ±£ÁôÁéÃô¶È²ÎÊýµ«Ä¬ÈÏÉèÎª1£¨±íÊ¾1:1Ó³Éä£¬²»¶îÍâËõ·Å£©
     [SerializeField] private float mouseSensitivity = 1f;
-    // ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½ï¿½×ªï¿½ï¿½Îªï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½
+    // ÓÅÏÈÊ¹ÓÃ´ËÉãÏñ»úµÄ Y Ðý×ª×÷Îª½ÇÉ«³¯Ïò£¬ÈôÎª¿ÕÔò»ØÍËµ½»ùÓÚÊó±êÊäÈëµÄÂß¼­
     [SerializeField] private Transform playerCamera;
 
     [Header("Paper Settings")]
     [SerializeField] private float paperSpeed = 15f;
     [SerializeField] private float paperDestroyDelay = 2f;
-
-    [SerializeField] private float fixedYHeight = 0.5f; // ï¿½Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½ß¶È£ï¿½ï¿½ï¿½Ôµï¿½ï¿½æ£©
-    [SerializeField] private float angularDrag = 5f; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½
+    [SerializeField] private float fixedYHeight = 0.5f; // ¹Ì¶¨·¢Éä¸ß¶È£¨Ïà¶ÔµØÃæ£©
+    [SerializeField] private float angularDrag = 5f; // ¼«¸ßÐý×ª×èÁ¦
     [SerializeField] private float spawnOffset = 0.2f;
 
     [Header("Interaction")]
-    public GameObject interactHint; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½UIï¿½ï¿½3Dï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
-
+    public GameObject interactHint; // ÍÏÈëÄãµÄUI»ò3DÌáÊ¾ÎïÌå
 
     private CharacterController _controller;
     private Vector3 _playerVelocity;
     private bool _isGrounded;
     private bool _isResonating = false;
-
-    private Vector3 _horizontalForward; // ï¿½ï¿½Ë®Æ½ï¿½ï¿½ï¿½ä·½ï¿½ï¿½
+    private Vector3 _horizontalForward; // ´¿Ë®Æ½·¢Éä·½Ïò
     private NPCController nearbyNPC;
 
-    private float yRotation; // ï¿½ï¿½É«Yï¿½ï¿½ï¿½ï¿½×ªï¿½Ç¶È£ï¿½Ö±ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë£©
+    private float yRotation; // ½ÇÉ«YÖáÐý×ª½Ç¶È£¨Ö±½ÓÏìÓ¦ÉãÏñ»ú/Êó±êÊäÈë£©
 
     public Vector3 startPosition = new Vector3(0, 0, 0);
-    private Vector3 _initialPosition;//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½É«Î»ï¿½ï¿½
+    private Vector3 _initialPosition;//³õÊ¼»¯½ÇÉ«Î»ÖÃ
     void Start()
     {
         _controller = GetComponent<CharacterController>();
         _initialPosition = transform.position;
         if (_controller == null)
         {
-            Debug.LogError("ï¿½ï¿½É«È±ï¿½ï¿½CharacterControllerï¿½ï¿½ï¿½ï¿½ï¿½");
+            Debug.LogError("½ÇÉ«È±ÉÙCharacterController×é¼þ£¡");
         }
 
-        // ï¿½ï¿½Î´ï¿½ï¿½ Inspector Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-        
+        // ÈôÎ´ÔÚ Inspector Ö¸¶¨ÉãÏñ»ú£¬³¢ÊÔÊ¹ÓÃÖ÷ÉãÏñ»ú
         if (playerCamera == null && Camera.main != null)
         {
             playerCamera = Camera.main.transform;
         }
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê£¬È·ï¿½ï¿½ï¿½ï¿½ï¿½ë²»ï¿½Ü´ï¿½ï¿½ï¿½Ó°ï¿½ï¿½
+
+        // Ëø¶¨Êó±ê£¬È·±£ÊäÈë²»ÊÜ´°¿ÚÓ°Ïì
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½×ªÎªï¿½ï¿½É«ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
+        // ³õÊ¼»¯Ðý×ªÎª½ÇÉ«³õÊ¼³¯Ïò
         yRotation = transform.eulerAngles.y;
     }
 
 
     void Update()
     {
-        // 1. ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½É«Yï¿½ï¿½ï¿½ï¿½ï¿½Ó½ï¿½Ò»ï¿½Â£ï¿½
-        UpdateRotationWithMouseOrCamera();
-
-        // 2. ï¿½ï¿½ï¿½ï¿½Ë®Æ½Ç°ï¿½ï¿½
+        // ¼ÆËã´¿Ë®Æ½·½Ïò£¨Ïû³ýYÖá·ÖÁ¿£©
         _horizontalForward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
 
-        // 3. ï¿½ï¿½É«ï¿½Æ¶ï¿½
-        HandleMovement();
-
-        // 4. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¾
-        HandleGravityAndJump();
-
-        // 5. Ö½Æ¬ï¿½ï¿½ï¿½ï¿½
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Resonate();
-        }
-        // ï¿½ï¿½â½»ï¿½ï¿½ï¿½ï¿½ï¿½ë£¨Eï¿½ï¿½ï¿½ï¿½
-        if (Input.GetKeyDown(KeyCode.E) && nearbyNPC != null)
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-    }
-
-    // ï¿½ï¿½ï¿½È¶ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½Ç¶È£ï¿½È·ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½È«Ò»ï¿½Â¡ï¿½
-    // ï¿½ï¿½Î´ï¿½á¹©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½ï¿½Ô£ï¿½ï¿½ï¿½
-    private void UpdateRotationWithMouseOrCamera()
-    {
-        if (playerCamera != null)
-        {
-            // Ö±ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½Ç¶È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½É«ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½È«Í¬ï¿½ï¿½
-            yRotation = playerCamera.eulerAngles.y;
-            transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
-            return;
-        }
-
-        // ï¿½ï¿½ï¿½Ë£ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Ô­ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½
-        float mouseX = Input.GetAxis("Mouse X");
-        yRotation += mouseX * mouseSensitivity * 100f * Time.deltaTime;
-        transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
-    }
-
-    private void HandleMovement()
-    {
+        // ½ÇÉ«ÒÆ¶¯Âß¼­
         _isGrounded = _controller.isGrounded;
-
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-        Vector3 moveDir = (transform.right * horizontal + transform.forward * vertical).normalized;
-
-        if (moveDir.magnitude >= 0.1f)
-        {
-            _controller.Move(moveDir * _moveSpeed * Time.deltaTime);
-        }
-    }
-
-    private void HandleGravityAndJump()
-    {
         if (_isGrounded && _playerVelocity.y < 0)
         {
             _playerVelocity.y = -0.5f;
         }
 
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        Vector3 moveDirection = (transform.right * horizontal + transform.forward * vertical).normalized;
+        _controller.Move(moveDirection * _moveSpeed * Time.deltaTime);
+
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
         {
-            _playerVelocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
+            _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -2f * _gravity);
         }
 
         _playerVelocity.y += _gravity * Time.deltaTime;
         _controller.Move(_playerVelocity * Time.deltaTime);
-    }
 
-    // Ö½Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö²ï¿½ï¿½ä£©
-    private void Resonate()
-    {
-        if (!_isResonating)
-            // 1. ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½É«Yï¿½ï¿½ï¿½ï¿½ï¿½Ó½ï¿½Ò»ï¿½Â£ï¿½
-            UpdateRotationWithMouseOrCamera();
-
-        // 2. ï¿½ï¿½ï¿½ï¿½Ë®Æ½Ç°ï¿½ï¿½
-        _horizontalForward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
-
-        // 3. ï¿½ï¿½É«ï¿½Æ¶ï¿½
-        HandleMovement();
-
-        // 4. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¾
-        HandleGravityAndJump();
-
-        // 5. Ö½Æ¬ï¿½ï¿½ï¿½ï¿½
         if (Input.GetKeyDown(KeyCode.R))
-
         {
             Resonate();
         }
-    }
-    private IEnumerator ResonanceVisualEffect()
-    {
-        _isResonating = true;
 
-        Renderer renderer = GetComponent<Renderer>();
-        if (renderer != null && renderer.material.HasProperty("_EmissionColor"))
+        // ¼ì²â½»»¥ÊäÈë£¨E¼ü£©
+        if (Input.GetKeyDown(KeyCode.E) && nearbyNPC != null)
         {
-            Material mat = renderer.material;
-            Color originalEmission = mat.GetColor("_EmissionColor");
-            Color brightEmission = originalEmission * 5;
-            mat.SetColor("_EmissionColor", brightEmission);
-
-            yield return new WaitForSeconds(0.3f);
-            mat.SetColor("_EmissionColor", originalEmission);
-        }
-        else
-        {
-            yield return new WaitForSeconds(0.3f);
+            nearbyNPC.Interact();
         }
 
-        GameObject paper = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        float groundY = transform.position.y - _controller.height / 2f;
-        Vector3 spawnPos = new Vector3(
-            transform.position.x + _horizontalForward.x * 0.3f + Random.Range(-spawnOffset, spawnOffset),
-            groundY + fixedYHeight,
-            transform.position.z + _horizontalForward.z * 0.3f + Random.Range(-spawnOffset, spawnOffset)
-        );
-        paper.transform.position = spawnPos;
-        paper.transform.rotation = Quaternion.Euler(90f, transform.eulerAngles.y, 0f);
+        // 1. Êó±ê/ÉãÏñ»úÐý×ª£¨±£Ö¤½ÇÉ«YÖáÓëÊÓ½ÇÒ»ÖÂ£©
+        UpdateRotationWithMouseOrCamera();
 
-        MeshCollider meshCollider = paper.GetComponent<MeshCollider>();
-        meshCollider.convex = true;
+        // 2. ¼ÆËãË®Æ½Ç°·½
+        _horizontalForward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
 
-        Rigidbody rb = paper.AddComponent<Rigidbody>();
-        rb.useGravity = false;
-        rb.angularDrag = angularDrag;
-        rb.constraints = RigidbodyConstraints.FreezePositionY
-                       | RigidbodyConstraints.FreezeRotationX
-                       | RigidbodyConstraints.FreezeRotationY
-                       | RigidbodyConstraints.FreezeRotationZ;
-        rb.velocity = _horizontalForward * paperSpeed;
+        // 3. ½ÇÉ«ÒÆ¶¯
+        HandleMovement();
 
-        Destroy(paper, paperDestroyDelay);
+        // 4. ÖØÁ¦ÓëÌøÔ¾
+        HandleGravityAndJump();
 
-        _isResonating = false;
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // 5. Ö½Æ¬·¢Éä
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Resonate();
+        }
+
+        // ½âËøÊó±ê
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
-
     }
 
     private void OnTriggerEnter(Collider other)
@@ -247,19 +153,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ï¿½ï¿½ï¿½È¶ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½Ç¶È£ï¿½È·ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½È«Ò»ï¿½Â¡ï¿½
-    // ï¿½ï¿½Î´ï¿½á¹©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½ï¿½Ô£ï¿½ï¿½ï¿½
+    // ÓÅÏÈ¶ÁÈ¡ÉãÏñ»úµÄ Y ½Ç¶È£¬È·±£½ÇÉ«·½ÏòÓëÊÓ½ÇÍêÈ«Ò»ÖÂ¡£
+    // ÈôÎ´Ìá¹©ÉãÏñ»úÒýÓÃÔò»ØÍËµ½»ùÓÚÊó±êÊäÈëµÄÐý×ª£¨±£³Ö¼æÈÝÐÔ£©¡£
     private void UpdateRotationWithMouseOrCamera()
     {
         if (playerCamera != null)
         {
-            // Ö±ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½Ç¶È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½É«ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½È«Í¬ï¿½ï¿½
+            // Ö±½ÓÊ¹ÓÃÉãÏñ»úµÄÊÀ½ç Y ½Ç¶È£¨±ÜÃâ²åÖµ»òËõ·Å£©£¬Ê¹½ÇÉ«ÓëÊÓ½ÇÍêÈ«Í¬²½
             yRotation = playerCamera.eulerAngles.y;
             transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
             return;
         }
 
-        // ï¿½ï¿½ï¿½Ë£ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Ô­ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½
+        // »ØÍË£ºÊ¹ÓÃÊó±êÊäÈë½øÐÐÐý×ª£¨Ô­ÓÐÂß¼­£©
         float mouseX = Input.GetAxis("Mouse X");
         yRotation += mouseX * mouseSensitivity * 100f * Time.deltaTime;
         transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
@@ -295,7 +201,7 @@ public class PlayerController : MonoBehaviour
         _controller.Move(_playerVelocity * Time.deltaTime);
     }
 
-    // Ö½Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö²ï¿½ï¿½ä£©
+    // Ö½Æ¬·¢ÉäÂß¼­£¨±£³Ö²»±ä£©
     private void Resonate()
     {
         if (!_isResonating)
@@ -351,3 +257,5 @@ public class PlayerController : MonoBehaviour
         _isResonating = false;
     }
 }
+
+
